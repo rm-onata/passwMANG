@@ -15,7 +15,6 @@ BYellow = "\033[1;33m"
 
 
 
-
 def banner():
 	system = platform.uname()[0]
 	if system == "Linux":
@@ -81,7 +80,6 @@ def show_db():
 		print(i)
 	input(BYellow+"\n\nPress Enter to Exit")
 	banner()
-
 
 
 
