@@ -1,5 +1,5 @@
 import os, sys
-import platform
+import platform, time
 
 
 
@@ -10,6 +10,8 @@ Green = "\033[0;32m"
 White = "\033[0;37m"
 BBlue = "\033[1;34m"
 BYellow = "\033[1;33m"
+
+
 
 
 
@@ -44,15 +46,19 @@ def banner():
 	banr = input(BYellow+"_> "+White)
 	if banr == "1":
 		add_new()
+
 	elif banr == "2":
 		banner()		#coming soon
+
 	elif banr == "3":
-		banner() 		#coming soon
+		show_db()
+
 	elif banr == "0":
 		if not os.path.exists("./src/db_main.cpt"):
 			os.system("ccencrypt ./src/db_main")
 		print(BYellow+"Good Luck :)")
 		sys.exit()
+
 	else:
 		print(Red+"Invalid number.\n")
 		time.sleep(1)
@@ -60,8 +66,23 @@ def banner():
 
 
 
+
+
 def show_db():
-	os.system("ccdecrypt ./src/db_main.cpt")
+	if os.path.exists("./src/db_main.cpt"):
+		os.system("ccdecrypt ./src/db_main.cpt")
+
+	os.system("clear")
+	with open("./src/db_main", "r") as f:
+		rdr = f.readlines()
+	
+	for i in rdr:
+		i = i.rstrip()
+		print(i)
+	input(BYellow+"\n\nPress Enter to Exit")
+	banner()
+
+
 
 
 
