@@ -1,6 +1,5 @@
 from cryptography.fernet import Fernet
-import os, sys
-import platform, time
+import os, sys, time
 
 
 
@@ -54,13 +53,6 @@ def decrypt():
 
 
 def banner():
-	system = platform.uname()[0]
-	#if system == "Linux":
-	#	os.system("bash ./src/chk.sh; clear")
-	#else:
-	#	print("Windows does not support")
-	#	sys.exit()
-
 	print(BBlue+"""
                                             _                                               
                                            | |                                              
