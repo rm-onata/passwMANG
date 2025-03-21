@@ -1,3 +1,4 @@
+from cryptography.fernet import Fernet
 import os, sys
 import platform, time
 
@@ -12,16 +13,53 @@ BBlue = "\033[1;34m"
 BYellow = "\033[1;33m"
 
 
+key = "root1234"
+fernet = Fernet(key)
+
+
+def encrypt():
+	try:
+		os.remove("db_main.enc")
+	except:
+		pass
+
+	with open("db_main", "rb") as file:
+		original = file.read()
+		
+	encrypted = fernet.encrypt(original)
+	
+	with open("db_main.enc", "wb") as encrypted_file:
+		encrypted_file.write(encrypted)
+
+
+
+def decrypt():
+	try:
+		os.remove("db_main")
+	except:
+		pass
+
+	with open("db_main.enc", "rb") as enc_file:
+		encrypted = enc_file.read()
+	
+	decrypted = fernet.decrypt(encrypted)
+	
+	with open("db_main", "wb") as dec_file:
+		dec_file.write(decrypted)
+
+
+
+
 
 
 
 def banner():
 	system = platform.uname()[0]
-	if system == "Linux":
-		os.system("bash ./src/chk.sh; clear")
-	else:
-		print("Windows does not support")
-		sys.exit()
+	#if system == "Linux":
+	#	os.system("bash ./src/chk.sh; clear")
+	#else:
+	#	print("Windows does not support")
+	#	sys.exit()
 
 	print(BBlue+"""
                                             _                                               
@@ -53,14 +91,16 @@ def banner():
 		show_db()
 
 	elif banr == "0":
-		if not os.path.exists("./src/db_main.cpt"):
-			os.system("ccencrypt ./src/db_main")
+		if not os.path.exists("./src/db_main.enc"):
+			#os.system("ccencrypt ./src/db_main")
+			encrypt()
+
 		print(BYellow+"Good Luck :)")
 		sys.exit()
 
 	else:
 		print(Red+"Invalid number.\n")
-		time.sleep(1)
+		time.sleep(2)
 		banner()
 
 
@@ -68,8 +108,9 @@ def banner():
 
 
 def show_db():
-	if os.path.exists("./src/db_main.cpt"):
-		os.system("ccdecrypt ./src/db_main.cpt")
+	if os.path.exists("./src/db_main.enc"):
+		#os.system("ccdecrypt ./src/db_main.cpt")
+		decrypt()
 
 	os.system("clear")
 	with open("./src/db_main", "r") as f:
@@ -78,15 +119,18 @@ def show_db():
 	for i in rdr:
 		i = i.rstrip()
 		print(i)
+
 	input(BYellow+"\n\nPress Enter to Exit")
 	banner()
 
 
 
 
+
 def add_new():
-	if os.path.exists("./src/db_main.cpt"):
-		os.system("ccdecrypt ./src/db_main")
+	if os.path.exists("./src/db_main.enc"):
+		#os.system("ccdecrypt ./src/db_main")
+		decrypt()
 
 	domain = input("[-] Domain => ")
 	username = input("[-] username => ")
