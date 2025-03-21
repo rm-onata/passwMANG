@@ -2,6 +2,7 @@ from cryptography.fernet import Fernet
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes
+from getpass import getpass
 import os, sys, time, base64
 
 
@@ -27,15 +28,21 @@ def derive_key(password: str, salt: bytes) -> bytes:
     )
     return base64.urlsafe_b64encode(kdf.derive(password.encode()))
 
-password = "PASSWORD"
-
-salt = b"\xb6\x1d\xe8x_\xfd\x1c.O\x1d\xde\xd8K^\xd8\x07"
-key = derive_key(password, salt)
-
-fernet = Fernet(key)
 
 
 def encrypt():
+	passwd0 = getpass(prompt="Input your password: ")
+	passwd1 = getpass(prompt="Input your password(Repeat): ")
+
+	if passwd0 != passwd1:
+		print(Red+"Incorrect password!")
+		sys.exit()
+		
+
+	salt = b"\xb6\x1d\xe8x_\xfd\x1c.O\x1d\xde\xd8K^\xd8\x07"
+	key = derive_key(passwd1, salt)
+	fernet = Fernet(key)
+
 	try:
 		os.remove("./src/db_main.enc")
 	except:
@@ -43,8 +50,12 @@ def encrypt():
 
 	with open("./src/db_main", "rb") as file:
 		original = file.read()
-		
-	encrypted = fernet.encrypt(original)
+	
+	try:
+		encrypted = fernet.encrypt(original)
+	except:
+		print(Red+"Signature did not match digest.")
+		sys.exit()
 	
 	with open("./src/db_main.enc", "wb") as encrypted_file:
 		encrypted_file.write(encrypted)
@@ -52,10 +63,27 @@ def encrypt():
 
 
 def decrypt():
+	passwd0 = getpass(prompt="Input your password: ")
+	passwd1 = getpass(prompt="Input your password(Repeat): ")
+
+	if passwd0 != passwd1:
+		print(Red+"Incorrect password!")
+		time.sleep(2)
+		banner()
+		
+
+	salt = b"\xb6\x1d\xe8x_\xfd\x1c.O\x1d\xde\xd8K^\xd8\x07"
+	key = derive_key(passwd1, salt)
+	fernet = Fernet(key)
+
 	with open("./src/db_main.enc", "rb") as enc_file:
 		encrypted = enc_file.read()
 	
-	decrypted = fernet.decrypt(encrypted)
+	try:
+		decrypted = fernet.decrypt(encrypted)
+	except:
+		print(Red+"Signature did not match digest.")
+		banner()
 	
 	with open("./src/db_main", "wb") as dec_file:
 		dec_file.write(decrypted)
