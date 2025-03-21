@@ -1,5 +1,8 @@
 from cryptography.fernet import Fernet
-import os, sys, time
+from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives import hashes
+import os, sys, time, base64
 
 
 
@@ -12,39 +15,52 @@ BBlue = "\033[1;34m"
 BYellow = "\033[1;33m"
 
 
-key = "root1234"
+
+
+def derive_key(password: str, salt: bytes) -> bytes:
+    kdf = PBKDF2HMAC(
+        algorithm=hashes.SHA256(),
+        length=32,
+        salt=salt,
+        iterations=100000,
+        backend=default_backend()
+    )
+    return base64.urlsafe_b64encode(kdf.derive(password.encode()))
+
+password = "root1234"
+
+salt = b"\xb6\x1d\xe8x_\xfd\x1c.O\x1d\xde\xd8K^\xd8\x07"
+key = derive_key(password, salt)
+
 fernet = Fernet(key)
 
 
 def encrypt():
 	try:
-		os.remove("db_main.enc")
+		os.remove("./src/db_main.enc")
 	except:
 		pass
 
-	with open("db_main", "rb") as file:
+	with open("./src/db_main", "rb") as file:
 		original = file.read()
 		
 	encrypted = fernet.encrypt(original)
 	
-	with open("db_main.enc", "wb") as encrypted_file:
+	with open("./src/db_main.enc", "wb") as encrypted_file:
 		encrypted_file.write(encrypted)
 
 
 
 def decrypt():
-	try:
-		os.remove("db_main")
-	except:
-		pass
-
-	with open("db_main.enc", "rb") as enc_file:
+	with open("./src/db_main.enc", "rb") as enc_file:
 		encrypted = enc_file.read()
 	
 	decrypted = fernet.decrypt(encrypted)
 	
-	with open("db_main", "wb") as dec_file:
+	with open("./src/db_main", "wb") as dec_file:
 		dec_file.write(decrypted)
+	
+	os.remove("./src/db_main.enc")
 
 
 
@@ -84,8 +100,8 @@ def banner():
 
 	elif banr == "0":
 		if not os.path.exists("./src/db_main.enc"):
-			#os.system("ccencrypt ./src/db_main")
 			encrypt()
+			os.remove("./src/db_main")
 
 		print(BYellow+"Good Luck :)")
 		sys.exit()
@@ -101,7 +117,6 @@ def banner():
 
 def show_db():
 	if os.path.exists("./src/db_main.enc"):
-		#os.system("ccdecrypt ./src/db_main.cpt")
 		decrypt()
 
 	os.system("clear")
@@ -121,7 +136,6 @@ def show_db():
 
 def add_new():
 	if os.path.exists("./src/db_main.enc"):
-		#os.system("ccdecrypt ./src/db_main")
 		decrypt()
 
 	domain = input("[-] Domain => ")
