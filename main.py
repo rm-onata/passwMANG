@@ -27,7 +27,7 @@ def derive_key(password: str, salt: bytes) -> bytes:
     )
     return base64.urlsafe_b64encode(kdf.derive(password.encode()))
 
-password = "root1234"
+password = "PASSWORD"
 
 salt = b"\xb6\x1d\xe8x_\xfd\x1c.O\x1d\xde\xd8K^\xd8\x07"
 key = derive_key(password, salt)
