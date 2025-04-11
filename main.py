@@ -21,6 +21,10 @@ DB_PATH = os.path.join("src", "db_main")
 DB_PATH_ENC = os.path.join("src", "db_main.enc")
 
 
+if not os.path.exists("src"):
+	os.mkdir("src")
+
+
 def derive_key(password: str, salt: bytes) -> bytes:
     kdf = PBKDF2HMAC(
         algorithm=hashes.SHA256(),
