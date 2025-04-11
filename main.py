@@ -17,6 +17,9 @@ BYellow = "\033[1;33m"
 
 
 
+DB_PATH = os.path.join("src", "db_main")
+DB_PATH_ENC = os.path.join("src", "db_main.enc")
+
 
 def derive_key(password: str, salt: bytes) -> bytes:
     kdf = PBKDF2HMAC(
@@ -44,11 +47,11 @@ def encrypt():
 	fernet = Fernet(key)
 
 	try:
-		os.remove("./src/db_main.enc")
+		os.remove(DB_PATH_ENC)
 	except:
 		pass
 
-	with open("./src/db_main", "rb") as file:
+	with open(DB_PATH, "rb") as file:
 		original = file.read()
 	
 	try:
@@ -57,7 +60,7 @@ def encrypt():
 		print(Red+"Signature did not match digest.")
 		sys.exit()
 	
-	with open("./src/db_main.enc", "wb") as encrypted_file:
+	with open(DB_PATH_ENC, "wb") as encrypted_file:
 		encrypted_file.write(encrypted)
 
 
@@ -76,7 +79,7 @@ def decrypt():
 	key = derive_key(passwd1, salt)
 	fernet = Fernet(key)
 
-	with open("./src/db_main.enc", "rb") as enc_file:
+	with open(DB_PATH_ENC, "rb") as enc_file:
 		encrypted = enc_file.read()
 	
 	try:
@@ -85,10 +88,10 @@ def decrypt():
 		print(Red+"Signature did not match digest.")
 		banner()
 	
-	with open("./src/db_main", "wb") as dec_file:
+	with open(DB_PATH, "wb") as dec_file:
 		dec_file.write(decrypted)
 	
-	os.remove("./src/db_main.enc")
+	os.remove(DB_PATH_ENC)
 
 
 
@@ -127,9 +130,9 @@ def banner():
 		show_db()
 
 	elif banr == "0":
-		if not os.path.exists("./src/db_main.enc"):
+		if not os.path.exists(DB_PATH_ENC):
 			encrypt()
-			os.remove("./src/db_main")
+			os.remove(DB_PATH)
 
 		print(BYellow+"Good Luck :)")
 		sys.exit()
@@ -144,11 +147,11 @@ def banner():
 
 
 def show_db():
-	if os.path.exists("./src/db_main.enc"):
+	if os.path.exists(DB_PATH_ENC):
 		decrypt()
 
 	os.system("clear")
-	with open("./src/db_main", "r") as f:
+	with open(DB_PATH, "r") as f:
 		rdr = f.readlines()
 	
 	for i in rdr:
@@ -163,14 +166,14 @@ def show_db():
 
 
 def add_new():
-	if os.path.exists("./src/db_main.enc"):
+	if os.path.exists(DB_PATH_ENC):
 		decrypt()
 
 	domain = input("[-] Domain => ")
 	username = input("[-] username => ")
 	password = input("[-] password => ")
 
-	with open("./src/db_main", "a+") as f:
+	with open(DB_PATH, "a+") as f:
 		f.write("site_name : "+domain+"\n")
 		f.write("username : "+username+"\n")
 		f.write("password : "+password+"\n")
